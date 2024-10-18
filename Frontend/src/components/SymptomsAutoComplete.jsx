@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
-const symptomsList = [
+const suggestionsList = [
   "red sore around nose", "fast heart rate", "weight gain", "spinning movements",
   "cough", "loss of appetite", "weakness of one body side", "muscle weakness",
   "diarrhoea", "pain during bowel movements", "cold hands and feets", "sinus pressure",
@@ -40,7 +40,7 @@ const symptomsList = [
 ];
 
 
-const REF_CHIPS = 20; 
+const REF_CHIPS = 131; 
 
 const SymptomsAutoComplete = () => {
   const [chips, setChips] = useState([]);
@@ -86,9 +86,16 @@ const SymptomsAutoComplete = () => {
     }
   };
   
+  // const addChip = (chip) => {
+  //   if (!chips.includes(chip)) {
+  //     setChips([...chips, chip]);
+  //   }
+  // };
+  
   const addChip = (chip) => {
-    if (!chips.includes(chip)) {
-      setChips([...chips, chip]);
+    const formattedChip = chip.replace(/\s+/g, '_'); // Replace spaces with underscores
+    if (!chips.includes(formattedChip)) {
+      setChips([...chips, formattedChip]); // Store the formatted chip
     }
   };
   
