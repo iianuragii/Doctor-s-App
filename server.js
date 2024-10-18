@@ -5,7 +5,7 @@ require('./Database/dbConnect');
 const { allocation_priority } = require('./Backend/allocation_priority'); 
 
 app.use(cors());
-const port = 4000;
+const port = 4001;
 
 app.get('/',(req,res)=>{
     // const input = ["fatigue", "blackheads", "weight_loss", "acidity"];
