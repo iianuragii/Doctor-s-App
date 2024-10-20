@@ -1,11 +1,12 @@
+from flask import Flask, request, jsonify
 import pickle
 import joblib
 import os
 import numpy as np
 
-
+app = Flask(__name__)
 # Step 1: Specify the directory and file name where the model is saved
-directory = 'C:\\Users\\SWAPNIL\\Documents\\DoctorsApp-4thYear\\Doctor-s-App\\Prediction'  # Replace with your directory
+directory =  'C:\\Users\\Anurag dutta\\Desktop\\Doctor-s-app\\Prediction' # Replace with your directory
 model_filename = 'disease_prediction_model.pkl'
 label_encoder_filename='label_encoder_2.pkl'
 scaler_filename='scaler.pkl'
@@ -117,13 +118,26 @@ disease_labels = ['(vertigo) Paroymsal  Positional Vertigo','AIDS', 'Acne',
  'Urinary tract infection', 'Varicose veins', 'hepatitis A']  # The possible diseases the model can predict
 
     # Load the model
-model = load_model(model_path)
+# model = load_model(model_path)
 
     # Get symptoms from user (example input)
-user_symptoms =  ['continuous_sneezing','high_fever','cough']
+# user_symptoms =  ['continuous_sneezing','high_fever','cough']
 
     # Predict the disease
-predicted_disease = predict(user_symptoms, loaded_model, all_symptoms_list, disease_labels)
+# predicted_disease = predict(user_symptoms, loaded_model, all_symptoms_list, disease_labels)
 
 
-print(f"Predicted Disease: {predicted_disease}")
+# print(f"Predicted Disease: {predicted_disease}")
+
+
+@app.route('/predict', methods=['POST'])
+def predict_disease():
+    data = request.json
+    user_symptoms = data['symptoms']
+    predicted_disease = predict(user_symptoms, loaded_model, all_symptoms_list, disease_labels)
+    print(f"Predicted Disease: {predicted_disease}")
+    print(f"user symptoms: {user_symptoms}")
+    return jsonify({'predicted_disease': predicted_disease})
+
+if __name__ == '__main__':
+    app.run(port=5000)  # You can choose any available port
