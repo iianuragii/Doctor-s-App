@@ -6,6 +6,7 @@ import numpy as np
 
 app = Flask(__name__)
 # Step 1: Specify the directory and file name where the model is saved
+
 directory =  'C:\\Users\\Anurag dutta\\Desktop\\Doctor-s-app\\Prediction' # Replace with your directory
 model_filename = 'disease_prediction_model.pkl'
 label_encoder_filename='label_encoder_2.pkl'
