@@ -10,6 +10,7 @@ const port = 4000;
 
 app.get('/',(req,res)=>{
     const input = ["fatigue", "blackheads", "weight_loss", "acidity"];
+    // const {input} = req.body;
     const result = allocation_priority(input);  
     res.send(`Doctor allocated : ${result}`);  
 })
