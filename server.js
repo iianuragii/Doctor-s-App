@@ -33,6 +33,7 @@ app.post('/api', async (req, res) => {
 
         diseaseName = { symptoms: formData.symptoms, result: predictedDisease };
 
+
         res.status(200).json({ message: 'Doctor allocated', result: predictedDisease });
     } catch (error) {
         console.error('Error predicting disease:', error);
