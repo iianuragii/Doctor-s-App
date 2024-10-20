@@ -1,5 +1,4 @@
 import React from 'react';
-// import Dummy from './components/Dummy';
 import Signup from './components/Signup';
 import Login from './components/Login';
 import Appointment from './components/Appointment';

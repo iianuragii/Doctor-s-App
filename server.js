@@ -8,21 +8,26 @@ app.use(cors());
 app.use(express.json());
 const port = 4000;
 
-app.get('/',(req,res)=>{
-    const input = ["fatigue", "blackheads", "weight_loss", "acidity"];
-    // const {input} = req.body;
-    const result = allocation_priority(input);  
-    res.send(`Doctor allocated : ${result}`);  
-})
+let storedData = null;
 
-// app.get('/api',(req,res)=>{
-//     return res.json({val:"Hola from Backend"});
-// })
+app.get('/', (req, res) => {
+    if (storedData) {
+        res.send(`Doctor allocated based on symptoms: ${storedData.result}`);
+    } else {
+        res.send('No data received yet. Please submit the symptoms via /api');
+    }
+});
+
 app.post('/api', (req, res) => {
     const formData = req.body;
-    console.log('Form Data:', formData);
-    res.status(200).json({ message: 'Form data received successfully', formData });
-  });
+    console.log('Form Data:', formData.symptoms);
+    const result = allocation_priority(formData.symptoms); 
+    
+    storedData = { symptoms: formData.symptoms, result };
+
+    res.status(200).json({ message: 'Doctor allocated', result });
+});
+
   
 
 app.listen(port,()=>{
