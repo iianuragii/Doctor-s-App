@@ -10,10 +10,10 @@ app.use(express.json());
 const port = 4000;
 
 let storedData = null;
-
+let diseaseName = null;
 app.get('/', (req, res) => {
     if (storedData) {
-        res.send(`Doctor allocated based on symptoms: ${storedData.result}`);
+        res.send(`Doctor allocated based on symptoms: ${storedData.result} and disease: ${diseaseName.result}`);
     } else {
         res.send('No data received yet. Please submit the symptoms via /api');
     }
@@ -31,7 +31,8 @@ app.post('/api', async (req, res) => {
         const response = await axios.post('http://localhost:5000/predict', { symptoms: formData.symptoms });
         const predictedDisease = response.data.predicted_disease;
 
-        storedData = { symptoms: formData.symptoms, result: predictedDisease };
+        diseaseName = { symptoms: formData.symptoms, result: predictedDisease };
+
 
         res.status(200).json({ message: 'Doctor allocated', result: predictedDisease });
     } catch (error) {
