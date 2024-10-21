@@ -2,12 +2,16 @@ from flask import Flask, request, jsonify
 import pickle
 import joblib
 import os
+from dotenv import load_dotenv
 import numpy as np
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 # Step 1: Specify the directory and file name where the model is saved
 
-directory =  'D:\\DoctorApp\\Doctor-s-App\\Prediction' # Replace with your directory
+directory = os.getenv('MODEL_DIRECTORY') 
 model_filename = 'disease_prediction_model.pkl'
 label_encoder_filename='label_encoder_2.pkl'
 scaler_filename='scaler.pkl'
