@@ -39,7 +39,7 @@ function dept_allocation(diseaseName) {
         "Varicose veins": "Phlebologist",
         "Bronchial Asthma": "Pulmonologist",
         "Pneumonia": "Pulmonologist",
-        "Osteoarthritis": "Rheumatologists",
+        "Osteoarthristis": "Rheumatologists",
         "Arthritis": "Rheumatologists",
         "Tuberculosis": "Pulmonologist"
     };
