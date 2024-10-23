@@ -1,12 +1,20 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
+  const navigate = useNavigate(); // Initialize navigate here
+
+  const handleSignUpClick = (e) => {
+    e.preventDefault(); // Prevents page reload on form submit
+    navigate('/dashboard'); // Correct way to navigate
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
         <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">Sign Up</h1>
-        
-        <form className="space-y-4">
+
+        <form className="space-y-4" onSubmit={handleSignUpClick}>
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
               Email
