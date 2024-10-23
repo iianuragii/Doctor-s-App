@@ -13,6 +13,7 @@ import { motion } from 'framer-motion'; // Import from framer-motion
 import background1 from '../../assets/background1.png';
 import background2 from '../../assets/background2.png';
 import background3 from '../../assets/background3.png';
+import About from './About';
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -117,7 +118,7 @@ const Dashboard = () => {
       {/* Parallax Sections with Animations */}
       <Box id="home" sx={parallaxStyles(background2)}>
         <Container sx={{ textAlign: 'center', py: isMobile ? 5 : 10 }}>
-        <motion.div initial="hidden" animate="visible" variants={animations.fadeIn}>
+        <motion.div initial="hidden" animate="visible" variants={animations.zoomIn}>
         <Typography
           variant={isMobile ? 'h4' : 'h2'}
           color="white"
@@ -128,7 +129,7 @@ const Dashboard = () => {
         </Typography>
       </motion.div>
 
-      <motion.div initial="hidden" animate="visible" variants={animations.fadeIn}>
+      <motion.div initial="hidden" animate="visible" variants={animations.zoomIn}>
         <Typography variant="h6" color="white" sx={textStyles}>
           Book Appointments and Manage Health Effortlessly
         </Typography>
@@ -148,87 +149,8 @@ const Dashboard = () => {
         </Container>
       </Box>
 
-      <Box
-        id="about"
-        sx={{
-          minHeight: '100vh',
-          background: 'linear-gradient(45deg, #F0F4F8 30%, #90E4C1 90%)',
-          py: 10,
-        }}
-      >
-        <Container maxWidth="md">
-          <Grid container spacing={4}>
-            <Grid item xs={12}>
-              <motion.div initial="hidden" whileInView="visible" variants={animations.fadeIn}>
-                <Typography
-                  variant={isMobile ? 'h5' : 'h3'}
-                  align="center"
-                  gutterBottom
-                  sx={{ fontWeight: 'bold', color: '#00796B' }}
-                >
-                  About Us
-                </Typography>
-              </motion.div>
-            </Grid>
-
-            <Grid item xs={12}>
-              <motion.div initial="hidden" whileInView="visible" variants={animations.slideIn}>
-                <Typography variant="body1" align="center">
-                  Our healthcare platform allows patients to seamlessly book appointments with doctors.
-                  We aim to simplify healthcare management for both doctors and patients.
-                </Typography>
-              </motion.div>
-            </Grid>
-
-            {/* FAQs Section */}
-            <Grid item xs={12}>
-              <motion.div initial="hidden" whileInView="visible" variants={animations.zoomIn}>
-                <Typography
-                  variant="h4"
-                  align="center"
-                  sx={{ fontWeight: 'bold', color: '#00796B', mb: 4 }}
-                >
-                  Frequently Asked Questions
-                </Typography>
-              </motion.div>
-
-             {/** FAQs using Accordion **/}
-              {['What services do you offer?', 
-                'How can I book an appointment?', 
-                'What is the cancellation policy?', 
-                'Do you offer teleconsultations?', 
-                'How do I contact customer support?'].map((faq, index) => (
-                <motion.div
-                  key={index}
-                  initial="hidden"
-                  whileInView="visible"
-                  variants={animations['zoomIn' ]} 
-                >
-                  <Accordion sx={{ mb: 2 }}>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                      <Typography variant="h6">{faq}</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Typography>
-                        {faq === 'What services do you offer?' &&
-                          'We offer appointment booking, teleconsultations, and health management tools.'}
-                        {faq === 'How can I book an appointment?' &&
-                          'You can book an appointment through our app or website by navigating to the appointment section.'}
-                        {faq === 'What is the cancellation policy?' &&
-                          'Appointments can be canceled up to 24 hours before the scheduled time without any charge.'}
-                        {faq === 'Do you offer teleconsultations?' &&
-                          'Yes, we offer teleconsultations for specific health issues. Check with your doctor if eligible.'}
-                        {faq === 'How do I contact customer support?' &&
-                          'You can reach out to our support team via the Contact Us page or call our helpline.'}
-                      </Typography>
-                    </AccordionDetails>
-                  </Accordion>
-                </motion.div>
-              ))}
-
-            </Grid>
-          </Grid>
-        </Container>
+      <Box id="about">
+          <About/>
       </Box>
 
       <Box id="appointment" sx={parallaxStyles(background3)}>
@@ -244,12 +166,30 @@ const Dashboard = () => {
             </Typography>
           </motion.div>
 
-          <motion.div initial="hidden" animate="visible" variants={animations.fadeIn}>
+          <motion.div initial="hidden" animate="visible" variants={animations.slideIn}>
             <Typography variant="h6" color="white" sx={textStyles}>
               Easy scheduling at your fingertips
             </Typography>
           </motion.div>
         </Container>
+        <Button
+          sx={{
+            px: 4,
+            py:2,
+            backgroundColor: '#00796B',
+            color: 'white',
+            display: 'block',
+            margin: '20px auto',
+            textAlign: 'center',
+            borderRadius: 2,
+            '&:hover': {
+              backgroundColor: '#00574B',
+            },
+          }}
+          onClick={handleAppointmentClick}
+        >
+          Book Your Appointment Now
+        </Button>
       </Box>
 
       <Box component="footer" sx={{ backgroundColor: '#00796B', color: 'white', py: 2 }}>
