@@ -37,15 +37,19 @@ app.post('/api', async (req, res) => {
         const response = await axios.post('http://localhost:5000/predict', { symptoms: formData.symptoms });
         const predictedDisease = response.data.predicted_disease;
 
-        diseaseName = { symptoms: formData.symptoms, result: predictedDisease };
+        // Capitalize the first letter of the predicted disease name
+        const capitalizedDisease = predictedDisease.charAt(0).toUpperCase() + predictedDisease.slice(1);
+        
+        diseaseName = { symptoms: formData.symptoms, result: capitalizedDisease };
 
         // Sending disease name to dept allocation function
         const deptName = dept_allocation(diseaseName.result.trim());
         department = {disease: diseaseName.result.trim(), result: deptName};
         console.log(deptName);
+        
         res.status(200).json({ 
             message: 'Doctor allocated', 
-            predictedDisease, 
+            predictedDisease: capitalizedDisease, 
             department: deptName 
         });
         
