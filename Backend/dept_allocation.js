@@ -19,7 +19,7 @@ function dept_allocation(diseaseName) {
         "Jaundice": "Gastroenterologist",
         "Dimorphic hemmorhoids(piles)": "Gastroenterologist",
         "Gastroenteritis": "Gastroenterologist",
-        "Urinary tract infection": "Gynecologist",
+        "Urinary tract infection": "Urologist",
         "Chronic cholestasis": "Hepatologist",
         "Hepatitis A": "Hepatologist",
         "Hepatitis B": "Hepatologist",
