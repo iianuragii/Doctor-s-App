@@ -38,9 +38,9 @@ const Signup = () => {
         body: JSON.stringify(formData),
       });
 
-      //const data = await response.json();     
+      const data = await response.json();     
 
-      //console.log('Signup successful:', data);
+      console.log('Signup successful:', data);
       navigate('/dashboard'); 
     }catch (err) {
       console.error('Network error:', err);
@@ -136,7 +136,7 @@ const Signup = () => {
                 name="email"
                 variant="outlined"
                 fullWidth
-                //required
+                required
                 value={formData.email}
                 onChange={handleInputChange}
                 sx={{ mb: 2, fontSize: { xs: '0.85rem', md: '1rem' } }}
@@ -148,7 +148,7 @@ const Signup = () => {
                 name="password"
                 variant="outlined"
                 fullWidth
-                //required
+                required
                 value={formData.password}
                 onChange={handleInputChange}
                 sx={{ mb: 4, fontSize: { xs: '0.85rem', md: '1rem' } }}
