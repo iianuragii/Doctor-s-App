@@ -23,6 +23,12 @@ app.get('/', (req, res) => {
     }
 });
 
+app.post('/signup',async (req,res)=>{
+  const { email, password } = req.body;
+  console.log('Received email: ', email);
+  console.log('Received password: ', password);
+})
+
 app.post('/api', async (req, res) => {
     // Received the form data from client-side
     const formData = req.body;

@@ -9,7 +9,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Link as ScrollLink } from 'react-scroll';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion'; // Import from framer-motion
+import { motion } from 'framer-motion'; 
 import background1 from '../../assets/background1.png';
 import background2 from '../../assets/background2.png';
 import background3 from '../../assets/background3.png';
@@ -40,7 +40,6 @@ const Dashboard = () => {
     navigate('/appointment');
   };
 
-  // Different animations for variety
   const animations = {
     fadeIn: {
       hidden: { opacity: 0, y: 50 },
