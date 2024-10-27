@@ -27,6 +27,8 @@ app.post('/signup',async (req,res)=>{
   const { email, password } = req.body;
   console.log('Received email: ', email);
   console.log('Received password: ', password);
+
+  res.status(200).json({ message: 'Data received' });
 })
 
 app.post('/api', async (req, res) => {
