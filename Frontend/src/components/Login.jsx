@@ -38,10 +38,15 @@ const Login = () => {
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
-
-      console.log('Login successful:', data);
-      navigate('/dashboard');
+      if (response.status === 200) {
+        const data = await response.json();
+        console.log('Login successful:', data);
+        navigate('/dashboard'); // Navigate to the dashboard on successful login
+      } else if (response.status === 401) {
+        setError('Invalid email or password. Please try again.'); // Display error message
+      } else {
+        setError('An unexpected error occurred. Please try again later.');
+      }
     } catch (err) {
       console.error('Network error:', err);
       setError('Failed to connect to the server.');
