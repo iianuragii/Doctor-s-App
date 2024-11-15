@@ -40,6 +40,9 @@ const Dashboard = () => {
     navigate('/appointment');
   };
 
+  const handleSignOutClick = () => {
+    navigate('/');
+  }
   const animations = {
     fadeIn: {
       hidden: { opacity: 0, y: 50 },
@@ -90,6 +93,9 @@ const Dashboard = () => {
               </Button>
               <Button color="inherit" onClick={handleAppointmentClick}>
                 Appointment
+              </Button>
+              <Button color="inherit" onClick={handleSignOutClick}>
+                Sign Out
               </Button>
             </Box>
           )}

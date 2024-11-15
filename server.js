@@ -1,10 +1,12 @@
 const express = require('express');
-const cors    = require('cors');
-const axios   = require('axios');
-const app     = express();
-const { allocation_priority } = require('./Backend/allocation_priority'); 
-const { dept_allocation }     = require('./Backend/dept_allocation');
-require('./Database/dbConnect');
+const cors = require('cors');
+const axios = require('axios');
+const app = express();
+const { allocation_priority } = require('./Backend/allocation_priority');
+const { dept_allocation } = require('./Backend/dept_allocation');
+const { MongoClient } = require('mongodb'); 
+require('dotenv').config(); 
+const client = require('./Database/dbAuth'); 
 
 app.use(cors());
 app.use(express.json());
@@ -23,44 +25,81 @@ app.get('/', (req, res) => {
     }
 });
 
-app.post('/signup',async (req,res)=>{
-  const { email, password } = req.body;
-  console.log('Received email: ', email);
-  console.log('Received password: ', password);
+app.post('/signup', async (req, res) => {
+    const { email, password } = req.body;
+    console.log('Received email: ', email);
+    console.log('Received password: ', password);
 
-  res.status(200).json({ message: 'Data received' });
-})
+    try {
+        // Ensure the client is connected
+        if (!client.topology || !client.topology.isConnected()) await client.connect();
+
+        const database = client.db("patientSignUp"); // Access the signup database
+        const collection = database.collection("patientSignUpCollection"); // Access the Signupcollection
+        const result = await collection.insertOne({ email, password }); // Insert the data
+        console.log('User inserted:', result.insertedId);
+
+        res.status(201).json({ message: 'User registered successfully' });
+    } catch (error) {
+        console.error('Error inserting user:', error);
+        res.status(500).json({ message: 'Error registering user' });
+    }
+});
+
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+    console.log('Received email: ', email);
+    console.log('Received password: ', password);
+
+    try {
+        // Ensure the client is connected
+        if (!client.topology || !client.topology.isConnected()) await client.connect();
+
+        const database = client.db("patientSignUp"); // Access the signup database
+        const collection = database.collection("patientSignUpCollection"); // Access the Signupcollection
+
+        // Find the user by email
+        const user = await collection.findOne({ email });
+        console.log('User found:', user);
+
+        if (user && user.password === password) {
+            console.log("Login successful");
+            res.status(200).json({ message: 'Login successful' });
+        } else {
+            console.log("Invalid credentials");
+            res.status(401).json({ message: 'Invalid email or password' });
+        }
+    } catch (error) {
+        console.error('Error in login endpoint:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
 
 app.post('/api', async (req, res) => {
-    // Received the form data from client-side
     const formData = req.body;
     console.log('Form Data:', formData.symptoms);
-    
-    // Sending the symptoms to the allocation priority function
-    const result = allocation_priority(formData.symptoms); 
+
+    const result = allocation_priority(formData.symptoms);
     storedData = { symptoms: formData.symptoms, result };
 
     try {
-        // Sending symptoms to the Python server
         const response = await axios.post('http://localhost:5000/predict', { symptoms: formData.symptoms });
         const predictedDisease = response.data.predicted_disease;
 
-        // Capitalize the first letter of the predicted disease name
         const capitalizedDisease = predictedDisease.charAt(0).toUpperCase() + predictedDisease.slice(1);
-        
+
         diseaseName = { symptoms: formData.symptoms, result: capitalizedDisease };
 
-        // Sending disease name to dept allocation function
         const deptName = dept_allocation(diseaseName.result.trim());
-        department = {disease: diseaseName.result.trim(), result: deptName};
+        department = { disease: diseaseName.result.trim(), result: deptName };
         console.log(deptName);
-        
-        res.status(200).json({ 
-            message: 'Doctor allocated', 
-            predictedDisease: capitalizedDisease, 
-            department: deptName 
+
+        res.status(200).json({
+            message: 'Doctor allocated',
+            predictedDisease: capitalizedDisease,
+            department: deptName,
         });
-        
     } catch (error) {
         console.error('Error predicting disease:', error);
         res.status(500).json({ message: 'Error predicting disease' });
@@ -69,4 +108,10 @@ app.post('/api', async (req, res) => {
 
 app.listen(port, () => {
     console.log(`Server is running at Port ${port}`);
+});
+
+process.on('SIGINT', async () => {
+    console.log('Closing MongoDB connection...');
+    await client.close();
+    process.exit(0);
 });
