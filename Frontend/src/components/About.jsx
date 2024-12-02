@@ -2,6 +2,7 @@ import React from 'react';
 import { Container, Grid, Typography, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { motion } from 'framer-motion'; // Importing framer-motion
+import { useMediaQuery, useTheme } from '@mui/material'; // Importing useMediaQuery for responsiveness
 
 const animations = {
   fadeIn: {
@@ -23,13 +24,16 @@ const faqs = [
 ];
 
 const About = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); 
+
   return (
-    <Container maxWidth="md" sx={{ minHeight: '100vh', py: 10 }}>
+    <Container maxWidth="md" sx={{ minHeight: '100vh', py: isMobile ? 5 : 10 }}> 
       <Grid container spacing={4}>
         <Grid item xs={12}>
           <motion.div initial="hidden" whileInView="visible" variants={animations.fadeIn}>
             <Typography
-              variant="h3"
+              variant={isMobile ? 'h4' : 'h3'} 
               align="center"
               gutterBottom
               sx={{ fontWeight: 'bold', color: '#00796B' }}
@@ -42,7 +46,7 @@ const About = () => {
         <Grid item xs={12}>
           <motion.div initial="hidden" whileInView="visible" variants={animations.zoomIn}>
             <Typography
-              variant="h4"
+              variant={isMobile ? 'h6' : 'h4'} 
               align="center"
               sx={{ fontWeight: 'bold', color: '#00796B', mb: 4 }}
             >
@@ -54,7 +58,7 @@ const About = () => {
             <motion.div key={index} initial="hidden" whileInView="visible" variants={animations.zoomIn}>
               <Accordion sx={{ mb: 2 }}>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography variant="h6">{faq}</Typography>
+                  <Typography variant={isMobile ? 'body1' : 'h6'}>{faq}</Typography> 
                 </AccordionSummary>
                 <AccordionDetails>
                   <Typography>
