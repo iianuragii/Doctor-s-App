@@ -4,7 +4,9 @@ import Login from './components/Login';
 import Appointment from './components/Appointment';
 import About from './components/About';
 import Dashboard from './components/Dashboard';
+import Profile from './components/Profile';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
 
 const App = () => {
   return (
@@ -15,6 +17,7 @@ const App = () => {
         <Route path='/about' element={<About />} />
         <Route path='/dashboard' element={<Dashboard/>} />
         <Route path='/appointment' element={<Appointment />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </BrowserRouter>
   );
