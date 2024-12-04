@@ -10,7 +10,7 @@ const CustomCarousel = ({ images }) => {
 
   // Adjust the width based on the screen size (1 for mobile, 3 for laptop and larger)
   const getSlideWidth = () => {
-    if (isLaptop) return 33.33; // 3 images per slide for laptop and larger screens
+    if (isLaptop) return 36.33; // 3 images per slide for laptop and larger screens
     return 100; // 1 image per slide for mobile
   };
 
