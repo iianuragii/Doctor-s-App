@@ -19,6 +19,7 @@ import hospital5 from '../../assets/hospital5.jpg';
 import hospital6 from '../../assets/hospital6.jpg';
 import About from './About';
 import Navbar from './Navbar'; 
+import FAQ from './FAQ';
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -111,9 +112,14 @@ const Dashboard = () => {
         </Container>
       </Box>
 
-      {/* About Section */}
+      {/* About Platform Section */}
       <Box id="about" sx={{ paddingTop: '0px' }}>
         <About />
+      </Box>
+      
+      {/*Faqs section*/}
+      <Box id="about" sx={{ paddingTop: '0px' }}>
+        <FAQ />
       </Box>
 
       {/* Appointment Section */}
