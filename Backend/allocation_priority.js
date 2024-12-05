@@ -1,4 +1,14 @@
-function allocation_priority (input) {
+require('dotenv').config();
+const { MongoClient } = require('mongodb');
+
+// MongoDB client setup
+const uri = process.env.SECRET_KEY;
+const client = new MongoClient(uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+async function allocation_priority (input, department) {
     let i, sum = 0;
 
     const symptoms = {
@@ -143,12 +153,37 @@ function allocation_priority (input) {
 
     console.log("Weighted Sum = ", sum);
 
+    // Determine the priority based on sum
+    let priority;
     if (sum >= 10) {
-        return "High";
+        priority = "High";
     } else if (sum > 7 && sum < 10) {
-        return "Medium";
+        priority = "Medium";
     } else {
-        return "Low";
+        priority = "Low";
+    }
+
+    console.log("Priority:", priority);
+
+    // MongoDB: Fetch doctor's name based on the department
+    try {
+        await client.connect();
+        const db = client.db("doctordatabase");
+        const collection = db.collection("doctorcollection");
+
+        const doctorsCursor = collection.find({ Department: department });
+        const doctors = await doctorsCursor.toArray();
+
+        if (doctors.length > 0) {
+            doctors.forEach(doc => console.log("Doctor's Name:", doc.Name));
+        } else {
+            console.log(`No doctors found for department: ${department}`);
+        }
+
+    } catch (error) {
+        console.error("Error fetching doctor's details:", error);
+    } finally {
+        await client.close();
     }
 }
 
