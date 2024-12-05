@@ -5,6 +5,7 @@ import Appointment from './components/Appointment';
 import About from './components/About';
 import Dashboard from './components/Dashboard';
 import Profile from './components/Profile';
+import Output from './components/Output'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import HospitalDashboard from './components/HospitalDashboard';
 import PrivateRoute from './PrivateRoute';
@@ -34,7 +35,7 @@ const App = () => {
           path="/hospital"
           element={<PrivateRoute element={<HospitalDashboard />} />}
         />
-
+        <Route path="/output" element={<Output />} />
       </Routes>
     </BrowserRouter>
   );

@@ -71,6 +71,10 @@ app.post('/signup', async (req, res) => {
             message: 'User registered successfully',
             token: token,  // Include the JWT token in the response
         });
+        const result = await collection.insertOne({ email, password });
+
+        console.log('User inserted:', result.insertedId);
+        res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
         console.error('Error in signup endpoint:', error);
         res.status(500).json({ message: 'Error registering user' });
@@ -129,8 +133,7 @@ app.post('/login', async (req, res) => {
 app.post('/api', async (req, res) => {
     const { symptoms } = req.body;
 
-    try {
-        
+    try {       
 
         const response = await axios.post('http://localhost:5000/predict', { symptoms });
         const predictedDisease = response.data.predicted_disease;
