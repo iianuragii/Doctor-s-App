@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import SymptomsAutoComplete from './SymptomsAutoComplete';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Appointment = () => {
   const [formData, setFormData] = useState({
@@ -16,6 +17,7 @@ const Appointment = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,6 +53,7 @@ const handleSymptomsChange = (selectedSymptoms) => {
         const response = await axios.post('http://localhost:4000/api', formData);
         alert('Form submitted successfully');
         console.log('Response:', response.data);
+        navigate('/output');
       } catch (error) {
         console.error('Error submitting form:', error);
         alert('Failed to submit the form');

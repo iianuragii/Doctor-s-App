@@ -11,7 +11,7 @@ const AppointmentPage = () => {
   useEffect(() => {
     const fetchAppointmentDetails = async () => {
       try {
-        const response = await axios.get('localhost:4000/output'); // Replace with your API endpoint
+        const response = await axios.get('http://localhost:4000/output'); // Replace with your API endpoint
         setAppointmentDetails(response.data);
         setLoading(false);
       } catch (err) {
@@ -137,7 +137,7 @@ const AppointmentPage = () => {
             }}
           >
             <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-              Designation: <span style={{ fontWeight: 'normal' }}>{appointmentDetails?.doctorDesignation}</span>
+              Designation: <span style={{ fontWeight: 'normal' }}>{appointmentDetails?.designation}</span>
             </Typography>
           </Box>
         </Grid>
@@ -151,7 +151,7 @@ const AppointmentPage = () => {
             }}
           >
             <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-              Department: <span style={{ fontWeight: 'normal' }}>{appointmentDetails?.doctorDepartment}</span>
+              Department: <span style={{ fontWeight: 'normal' }}>{appointmentDetails?.dept}</span>
             </Typography>
           </Box>
         </Grid>
