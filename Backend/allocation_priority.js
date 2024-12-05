@@ -3,14 +3,12 @@ const { MongoClient } = require('mongodb');
 
 // MongoDB client setup
 const uri = process.env.SECRET_KEY;
-const client = new MongoClient(uri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+const client = new MongoClient(uri);
 
-async function allocation_priority (input, department) {
-    let i, sum = 0;
+async function allocation_priority(input, department) {
+    let sum = 0;
 
+    // Symptoms data (Add your symptoms data here)
     const symptoms = {
         "red_sore_around_nose": 7,
         "fast_heart_rate": 10,
@@ -147,25 +145,17 @@ async function allocation_priority (input, department) {
 
     const ob = new Map(Object.entries(symptoms));
 
-    for (i = 0; i < input.length; i++) {
-        sum += ob.get(input[i]); 
+    for (let i = 0; i < input.length; i++) {
+        sum += ob.get(input[i]) || 0;
     }
 
     console.log("Weighted Sum = ", sum);
 
     // Determine the priority based on sum
-    let priority;
-    if (sum >= 10) {
-        priority = "High";
-    } else if (sum > 7 && sum < 10) {
-        priority = "Medium";
-    } else {
-        priority = "Low";
-    }
-
+    let priority = sum >= 10 ? "High" : sum > 7 ? "Medium" : "Low";
     console.log("Priority:", priority);
 
-    // MongoDB: Fetch doctor's name based on the department
+    // MongoDB: Fetch doctor's details based on the department
     try {
         await client.connect();
         const db = client.db("doctordatabase");
@@ -175,16 +165,65 @@ async function allocation_priority (input, department) {
         const doctors = await doctorsCursor.toArray();
 
         if (doctors.length > 0) {
-            doctors.forEach(doc => console.log("Doctor's Name:", doc.Name));
+            // Map week days for ordering
+            const weekOrder = [
+                "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+            ];
+
+            // Find the doctor with the earliest availability
+            let currentDoctor = null;
+            let availableDay = null;
+            let earliestTime = null;
+
+            // Find the earliest available day and time for the doctor
+            for (let doc of doctors) {
+                if (doc.Days_available) {
+                    for (let [day, times] of Object.entries(doc.Days_available)) {
+                        if (times) {
+                            const sortedTimes = times.split(',').map(time => parseFloat(time)).sort((a, b) => a - b);
+                            if (!earliestTime || sortedTimes[0] < earliestTime) {
+                                availableDay = day;
+                                earliestTime = sortedTimes[0];
+                                currentDoctor = doc;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (currentDoctor && availableDay) {
+                // Update the doctor’s availability by removing the earliest time
+                let updatedTimes = currentDoctor.Days_available[availableDay]
+                    .split(',')
+                    .filter(time => parseFloat(time) !== earliestTime);
+
+                // Update the database
+                await collection.updateOne(
+                    { _id: currentDoctor._id },
+                    { $set: { [`Days_available.${availableDay}`]: updatedTimes.join(',') } }
+                );
+
+                console.log(`Disease : Allergy`);
+                console.log(`Allocated Department : ${department}`);
+                console.log(`Department: ${department}`);
+                console.log(`Doctor's Name: ${currentDoctor.Name}`);
+                console.log("Days Available:");
+                Object.entries(currentDoctor.Days_available).forEach(([day, times]) => {
+                    console.log(`${day}: "${times || "Not Available"}"`);
+                });
+                console.log(`Updated availability for ${currentDoctor.Name} on ${availableDay}: ${updatedTimes.join(',')}`);
+
+                // Terminate after the first operation for one doctor
+                return;
+            }
         } else {
             console.log(`No doctors found for department: ${department}`);
         }
-
     } catch (error) {
-        console.error("Error fetching doctor's details:", error);
+        console.error("Error fetching or updating doctor's details:", error);
     } finally {
         await client.close();
     }
 }
 
-module.exports = { allocation_priority }; 
+module.exports = { allocation_priority };
