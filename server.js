@@ -4,12 +4,15 @@ const axios = require('axios');
 const app = express();
 const { allocation_priority } = require('./Backend/allocation_priority');
 const { dept_allocation } = require('./Backend/dept_allocation');
-const { MongoClient } = require('mongodb'); 
 require('dotenv').config(); 
 const client = require('./Database/dbAuth'); 
+const api_router = require('./Backend/api_router');
 
 app.use(cors());
 app.use(express.json());
+
+app.use(api_router);
+
 const port = 4000;
 
 let storedData = null;
@@ -105,6 +108,7 @@ app.post('/api', async (req, res) => {
         res.status(500).json({ message: 'Error predicting disease' });
     }
 });
+
 
 app.listen(port, () => {
     console.log(`Server is running at Port ${port}`);
