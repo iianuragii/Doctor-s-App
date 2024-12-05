@@ -23,7 +23,7 @@ async function run() {
     const collection = database.collection("patientSignUpCollection");
 
     const documents = await collection.find({}).toArray();
-    console.log("Documents in Signupcollection:", documents);
+    // console.log("Documents in Signupcollection:", documents);
   } finally {
     await client.close();
   }
