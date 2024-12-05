@@ -1,47 +1,40 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
-const app = express();
 const { allocation_priority } = require('./Backend/allocation_priority');
 const { dept_allocation } = require('./Backend/dept_allocation');
-require('dotenv').config(); 
-const client = require('./Database/dbAuth'); 
-const api_router = require('./Backend/api_router');
+require('dotenv').config();
+const client = require('./Database/dbAuth');
+const router = express.Router();
 
+const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use(api_router);
-
 const port = 4000;
 
+// Shared Data
 let storedData = null;
 let diseaseName = null;
 let department = null;
 
+// Routes
 app.get('/', (req, res) => {
-    if (storedData) {
-        res.send(`Doctor allocated based on symptoms: ${storedData.result} 
-            and disease: ${diseaseName.result} vs department Name: ${department.result}`);
-    } else {
-        res.send('No data received yet. Please submit the symptoms via /api');
-    }
+    const message = storedData
+        ? `Doctor allocated based on symptoms: ${storedData.result}, disease: ${diseaseName.result}, department: ${department.result}`
+        : 'No data received yet. Please submit the symptoms via /api';
+    res.send(message);
 });
 
 app.post('/signup', async (req, res) => {
     const { email, password } = req.body;
-    console.log('Received email: ', email);
-    console.log('Received password: ', password);
 
     try {
-        // Ensure the client is connected
-        if (!client.topology || !client.topology.isConnected()) await client.connect();
+        await client.connect();
+        const collection = client.db("patientSignUp").collection("patientSignUpCollection");
+        const result = await collection.insertOne({ email, password });
 
-        const database = client.db("patientSignUp"); // Access the signup database
-        const collection = database.collection("patientSignUpCollection"); // Access the Signupcollection
-        const result = await collection.insertOne({ email, password }); // Insert the data
         console.log('User inserted:', result.insertedId);
-
         res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
         console.error('Error inserting user:', error);
@@ -51,25 +44,15 @@ app.post('/signup', async (req, res) => {
 
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
-    console.log('Received email: ', email);
-    console.log('Received password: ', password);
 
     try {
-        // Ensure the client is connected
-        if (!client.topology || !client.topology.isConnected()) await client.connect();
-
-        const database = client.db("patientSignUp"); // Access the signup database
-        const collection = database.collection("patientSignUpCollection"); // Access the Signupcollection
-
-        // Find the user by email
-        const user = await collection.findOne({ email });
-        console.log('User found:', user);
+        await client.connect();
+        const user = await client.db("patientSignUp").collection("patientSignUpCollection").findOne({ email });
 
         if (user && user.password === password) {
             console.log("Login successful");
             res.status(200).json({ message: 'Login successful' });
         } else {
-            console.log("Invalid credentials");
             res.status(401).json({ message: 'Invalid email or password' });
         }
     } catch (error) {
@@ -78,30 +61,25 @@ app.post('/login', async (req, res) => {
     }
 });
 
-
 app.post('/api', async (req, res) => {
-    const formData = req.body;
-    console.log('Form Data:', formData.symptoms);
-
-    const result = allocation_priority(formData.symptoms);
-    storedData = { symptoms: formData.symptoms, result };
+    const { symptoms } = req.body;
 
     try {
-        const response = await axios.post('http://localhost:5000/predict', { symptoms: formData.symptoms });
-        const predictedDisease = response.data.predicted_disease;
+        
 
+        const response = await axios.post('http://localhost:5000/predict', { symptoms });
+        const predictedDisease = response.data.predicted_disease;
         const capitalizedDisease = predictedDisease.charAt(0).toUpperCase() + predictedDisease.slice(1);
 
-        diseaseName = { symptoms: formData.symptoms, result: capitalizedDisease };
+        diseaseName = { symptoms, result: capitalizedDisease };
+        department = { disease: capitalizedDisease, result: dept_allocation(capitalizedDisease.trim()) };
 
-        const deptName = dept_allocation(diseaseName.result.trim());
-        department = { disease: diseaseName.result.trim(), result: deptName };
-        console.log(deptName);
-
+        console.log('Department:', department.result);
+        storedData = { symptoms, result: allocation_priority(symptoms, department.result) };
         res.status(200).json({
             message: 'Doctor allocated',
             predictedDisease: capitalizedDisease,
-            department: deptName,
+            department: department.result,
         });
     } catch (error) {
         console.error('Error predicting disease:', error);
@@ -109,11 +87,28 @@ app.post('/api', async (req, res) => {
     }
 });
 
+router.get('/output', (req, res) => {
+    if (!department) {
+        return res.status(404).json({ message: 'No data available. Please submit the form first!' });
+    }
 
-app.listen(port, () => {
-    console.log(`Server is running at Port ${port}`);
+    res.status(200).send({
+        doctorName: 'Dr. Anurag Dutta',
+        designation: 'MBBS 20 yrs',
+        dept: department.result,
+        diseaseName: department.disease,
+        allocationDate: 'ddmmyyyy',
+        allocationTime: '1030',
+    });
 });
 
+// Connect the router to the app
+app.use(router);
+
+// Start Server
+app.listen(port, () => console.log(`Server is running at Port ${port}`));
+
+// Handle Process Exit
 process.on('SIGINT', async () => {
     console.log('Closing MongoDB connection...');
     await client.close();
