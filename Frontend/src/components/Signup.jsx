@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { teal } from '@mui/material/colors';
 import SignUpImage2 from "../../assets/SignUpImage2.png";
+import jwt_decode from 'jwt-decode';
 
 const globalStyles = {
   fontFamily: 'Inter, sans-serif',
@@ -29,9 +30,110 @@ const Signup = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  // const handleSignUpClick = async (e) => {
+  //   e.preventDefault();
+
+  //   try {
+  //     const response = await fetch('http://localhost:4000/signup', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify(formData),
+  //     });
+
+  //     const data = await response.json();     
+
+  //     console.log('Signup successful:', data);
+  //     navigate('/dashboard'); 
+  //   } catch (err) {
+  //     console.error('Network error:', err);
+  //     setError('Failed to connect to the server.');
+  //   }
+  // };
+  // const handleSignUpClick = async (e) => {
+  //   e.preventDefault();
+  
+  //   try {
+  //     const response = await fetch('http://localhost:4000/signup', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify(formData),
+  //     });
+  
+  //     const data = await response.json();
+  
+  //     console.log('Signup successful:', data);
+  
+  //     // Use switch case to navigate based on role
+  //     switch (formData.role) {
+  //       case 'Patient':
+  //         navigate('/dashboard');
+  //         break;
+  //       case 'Hospital':
+  //         navigate('/hospital');
+  //         break;
+  //       default:
+  //         setError('Invalid role selected');
+  //     }
+  //   } catch (err) {
+  //     console.error('Network error:', err);
+  //     setError('Failed to connect to the server.');
+  //   }
+  // };
+  // const handleSignUpClick = async (e) => {
+  //   e.preventDefault();
+  
+  //   try {
+  //     const response = await fetch('http://localhost:4000/signup', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify(formData),
+  //     });
+  
+  //     const data = await response.json();
+  
+  //     if (response.ok) {
+  //       console.log('Signup successful:', data);
+  //       console.log('Server Response:', data);
+
+  
+  //       // Store the token in localStorage
+  //       if (data.token) {
+  //         localStorage.setItem('token', data.token);
+  //         console.log("token",decodedToken);
+  
+  //         // Decode the token to get user details
+  //         const decodedToken = jwt_decode(data.token);
+  //         console.log('Decoded Token:', decodedToken);
+  //       }
+  
+  //       // Navigate based on role
+  //       switch (formData.role) {
+  //         case 'Patient':
+  //           navigate('/dashboard');
+  //           break;
+  //         case 'Hospital':
+  //           navigate('/hospital');
+  //           break;
+  //         default:
+  //           setError('Invalid role selected');
+  //       }
+  //     } else {
+  //       setError(data.message || 'Signup failed');
+  //     }
+  //   } catch (err) {
+  //     console.error('Network error:', err);
+  //     setError('Failed to connect to the server.');
+  //   }
+  // };
   const handleSignUpClick = async (e) => {
     e.preventDefault();
-
+  
     try {
       const response = await fetch('http://localhost:4000/signup', {
         method: 'POST',
@@ -40,16 +142,55 @@ const Signup = () => {
         },
         body: JSON.stringify(formData),
       });
-
-      const data = await response.json();     
-
-      console.log('Signup successful:', data);
-      navigate('/dashboard'); 
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Signup successful:', data);
+  
+        // Store the JWT token in localStorage
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+  
+          // Decode the token to get user details (optional)
+          const decodedToken = jwt_decode(data.token);
+          console.log('Decoded Token:', decodedToken);
+  
+          // Check if the token is valid
+          if (isTokenExpired(data.token)) {
+            setError('Your session has expired. Please sign up again.');
+            localStorage.removeItem('token');
+            return;
+          }
+  
+          // Navigate to the dashboard directly upon successful signup
+          navigate('/dashboard');
+        } else {
+          setError('No token received. Please contact support.');
+        }
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message || 'Signup failed. Please try again.');
+      }
     } catch (err) {
       console.error('Network error:', err);
       setError('Failed to connect to the server.');
     }
   };
+  
+  // Function to check if the token is expired
+  const isTokenExpired = (token) => {
+    try {
+      const decodedToken = jwt_decode(token);
+      if (decodedToken && decodedToken.exp * 1000 < Date.now()) {
+        return true; // Token is expired
+      }
+      return false; // Token is valid
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return true; // Treat any error as expired
+    }
+  };
+  
 
   return (
     <Container 

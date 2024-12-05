@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { teal } from '@mui/material/colors';
 import LoginImage from "../../assets/SignUpImage1.png";
+import jwt_decode from 'jwt-decode';
 
 const globalStyles = {
   fontFamily: 'Inter, sans-serif',
@@ -28,7 +29,7 @@ const Login = () => {
 
   const handleLoginClick = async (e) => {
     e.preventDefault();
-
+  
     try {
       const response = await fetch('http://localhost:4000/login', {
         method: 'POST',
@@ -37,13 +38,36 @@ const Login = () => {
         },
         body: JSON.stringify(formData),
       });
-
-      if (response.status === 200) {
+  
+      if (response.ok) {
         const data = await response.json();
         console.log('Login successful:', data);
-        navigate('/dashboard'); // Navigate to the dashboard on successful login
+  
+        // Store the JWT token in localStorage
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+  
+          // Decode the token to get the user data (optional)
+          const decodedToken = jwt_decode(data.token);
+          console.log('Decoded token:', decodedToken);
+  
+          // Optionally, you can store the decoded data in the state or context
+          // e.g., setUser(decodedToken);
+  
+          // Check if the token is valid
+          if (isTokenExpired(data.token)) {
+            setError('Your session has expired. Please log in again.');
+            localStorage.removeItem('token');
+            return;
+          }
+  
+          // Navigate to the dashboard directly upon successful login
+          navigate('/dashboard');
+        } else {
+          setError('No token received. Please contact support.');
+        }
       } else if (response.status === 401) {
-        setError('Invalid email or password. Please try again.'); // Display error message
+        setError('Invalid email or password. Please try again.');
       } else {
         setError('An unexpected error occurred. Please try again later.');
       }
@@ -52,6 +76,23 @@ const Login = () => {
       setError('Failed to connect to the server.');
     }
   };
+  
+  // Function to check if the token is expired
+  const isTokenExpired = (token) => {
+    try {
+      const decodedToken = jwt_decode(token);
+      if (decodedToken && decodedToken.exp * 1000 < Date.now()) {
+        return true; // Token is expired
+      }
+      return false; // Token is valid
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return true; // Treat any error as expired
+    }
+  };
+  
+  
+  
 
   return (
     <Container 
