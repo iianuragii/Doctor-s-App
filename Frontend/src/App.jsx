@@ -5,6 +5,7 @@ import Appointment from './components/Appointment';
 import About from './components/About';
 import Dashboard from './components/Dashboard';
 import Profile from './components/Profile';
+import Output from './components/Output'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 
@@ -18,6 +19,7 @@ const App = () => {
         <Route path='/dashboard' element={<Dashboard/>} />
         <Route path='/appointment' element={<Appointment />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/output" element={<Output />} />
       </Routes>
     </BrowserRouter>
   );
