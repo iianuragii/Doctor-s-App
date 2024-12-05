@@ -27,8 +27,8 @@ const About = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm')); 
 
-  return (
-    <Container maxWidth="md" sx={{ minHeight: '100vh', py: isMobile ? 5 : 10 }}>
+return (
+<Container maxWidth="md" sx={{ minHeight: '100vh', py: isMobile ? 5 : 10 }}>
   <Grid container spacing={4}>
     <Grid item xs={12}>
       <motion.div initial="hidden" whileInView="visible" variants={animations.fadeIn}>
@@ -156,6 +156,57 @@ const About = () => {
       </Grid>
     </Grid>
   </Grid>
+  <Container maxWidth="md" sx={{ minHeight: '100vh', py: isMobile ? 5 : 10 }}> 
+      <Grid container spacing={4}>
+        <Grid item xs={12}>
+          <motion.div initial="hidden" whileInView="visible" variants={animations.fadeIn}>
+            <Typography
+              variant={isMobile ? 'h4' : 'h3'} 
+              align="center"
+              gutterBottom
+              sx={{ fontWeight: 'bold', color: '#00796B' }}
+            >
+            Frequently Asked Questions
+            </Typography>
+          </motion.div>
+        </Grid>
+
+        <Grid item xs={12}>
+          {/* <motion.div initial="hidden" whileInView="visible" variants={animations.zoomIn}>
+            <Typography
+              variant={isMobile ? 'h6' : 'h4'} 
+              align="center"
+              sx={{ fontWeight: 'bold', color: '#00796B', mb: 4 }}
+            >
+            </Typography>
+          </motion.div> */}
+
+          {faqs.map((faq, index) => (
+            <motion.div key={index} initial="hidden" whileInView="visible" variants={animations.zoomIn}>
+              <Accordion sx={{ mb: 2 }}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography variant={isMobile ? 'body1' : 'h6'}>{faq}</Typography> 
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Typography>
+                    {faq === 'What services do you offer?' &&
+                      'We offer appointment booking, teleconsultations, and health management tools.'}
+                    {faq === 'How can I book an appointment?' &&
+                      'You can book an appointment through our app or website by navigating to the appointment section.'}
+                    {faq === 'What is the cancellation policy?' &&
+                      'Appointments can be canceled up to 24 hours before the scheduled time without any charge.'}
+                    {faq === 'Do you offer teleconsultations?' &&
+                      'Yes, we offer teleconsultations for specific health issues. Check with your doctor if eligible.'}
+                    {faq === 'How do I contact customer support?' &&
+                      'You can reach out to our support team via the Contact Us page or call our helpline.'}
+                  </Typography>
+                </AccordionDetails>
+              </Accordion>
+            </motion.div>
+          ))}
+        </Grid>
+      </Grid>
+    </Container>
 </Container>
 
   );

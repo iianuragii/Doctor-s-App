@@ -15,7 +15,6 @@ import hospital6 from '../../assets/hospital6.jpg';
 import removeBackground from '../../assets/removed-background.png';
 import About from './About';
 import Navbar from './Navbar'; 
-import FAQ from './FAQ';
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -239,13 +238,8 @@ const Dashboard = () => {
         <About />
       </Box>
       
-      {/*Faqs section*/}
-      <Box id="about" sx={{ paddingTop: '0px' }}>
-        <FAQ />
-      </Box>
-
       {/* Appointment Section */}
-      <Box id="appointment" sx={parallaxStyles(background3)}>
+      {/* <Box id="appointment" sx={parallaxStyles(background3)}>
         <Container sx={{ textAlign: 'center', py: isMobile ? 5 : 16 }}>
           <motion.div initial="hidden" animate="visible" variants={animations.slideIn}>
             <Typography
@@ -281,7 +275,7 @@ const Dashboard = () => {
         >
           Book Your Appointment Now
         </Button>
-      </Box>
+      </Box> */}
 
       {/* Footer */}
       <Box component="footer" sx={{ backgroundColor: '#00796B', color: 'white', py: 2 }}>
