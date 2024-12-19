@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
-const { allocation_priority } = require('./Backend/allocation_priority');
+const { doc_allocation } = require('./Backend/doc_allocation');
 const { dept_allocation } = require('./Backend/dept_allocation');
 const jwt = require('jsonwebtoken'); 
 require('dotenv').config();
@@ -71,14 +71,10 @@ app.post('/signup', async (req, res) => {
             message: 'User registered successfully',
             token: token,  // Include the JWT token in the response
         });
-        const result = await collection.insertOne({ email, password });
-
-        console.log('User inserted:', result.insertedId);
-        res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
         console.error('Error in signup endpoint:', error);
-        res.status(500).json({ message: 'Error registering user' });
-    }
+        res.status(500).json({ message: 'Error registering user' });
+    }
 });
 
 // app.post('/login', async (req, res) => {
@@ -142,13 +138,16 @@ app.post('/api', async (req, res) => {
         diseaseName = { symptoms, result: capitalizedDisease };
         department = { disease: capitalizedDisease, result: dept_allocation(capitalizedDisease.trim()) };
 
-        console.log('Department:', department.result);
-        storedData = { symptoms, result: allocation_priority(symptoms, department.result) };
+        storedData = { symptoms, result: await doc_allocation(symptoms, department.result)};
+
         res.status(200).json({
             message: 'Doctor allocated',
             predictedDisease: capitalizedDisease,
             department: department.result,
+            doctorName: storedData,
+            designation: storedData.result.designation,
         });
+
     } catch (error) {
         console.error('Error predicting disease:', error);
         res.status(500).json({ message: 'Error predicting disease' });
@@ -159,24 +158,20 @@ router.get('/output', (req, res) => {
     if (!department) {
         return res.status(404).json({ message: 'No data available. Please submit the form first!' });
     }
-
     res.status(200).send({
-        doctorName: 'Dr. Anurag Dutta',
-        designation: 'MBBS 20 yrs',
+        doctorName: storedData.result.doctorName,
+        designation: storedData.result.designation,
         dept: department.result,
         diseaseName: department.disease,
         allocationDate: 'ddmmyyyy',
-        allocationTime: '1030',
+        allocationTime: storedData.result.visitTiming,
     });
 });
 
-// Connect the router to the app
 app.use(router);
 
-// Start Server
 app.listen(port, () => console.log(`Server is running at Port ${port}`));
 
-// Handle Process Exit
 process.on('SIGINT', async () => {
     console.log('Closing MongoDB connection...');
     await client.close();

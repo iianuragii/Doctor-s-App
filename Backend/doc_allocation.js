@@ -1,14 +1,12 @@
 require('dotenv').config();
 const { MongoClient } = require('mongodb');
-
-// MongoDB client setup
+const {convertToActualTime} = require('./time_conversion');
 const uri = process.env.SECRET_KEY;
 const client = new MongoClient(uri);
 
-async function allocation_priority(input, department) {
+async function doc_allocation(input, department) {
     let sum = 0;
 
-    // Symptoms data (Add your symptoms data here)
     const symptoms = {
         "red_sore_around_nose": 7,
         "fast_heart_rate": 10,
@@ -165,34 +163,39 @@ async function allocation_priority(input, department) {
         const doctors = await doctorsCursor.toArray();
 
         if (doctors.length > 0) {
-            // Map week days for ordering
-            const weekOrder = [
-                "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
-            ];
-
-            // Find the doctor with the earliest availability
             let currentDoctor = null;
             let availableDay = null;
             let earliestTime = null;
 
+            const weekOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
             // Find the earliest available day and time for the doctor
-            for (let doc of doctors) {
-                if (doc.Days_available) {
-                    for (let [day, times] of Object.entries(doc.Days_available)) {
-                        if (times) {
-                            const sortedTimes = times.split(',').map(time => parseFloat(time)).sort((a, b) => a - b);
-                            if (!earliestTime || sortedTimes[0] < earliestTime) {
-                                availableDay = day;
-                                earliestTime = sortedTimes[0];
-                                currentDoctor = doc;
+                for (let doc of doctors) {
+                    if (doc.Days_available) {
+                        for (let [day, times] of Object.entries(doc.Days_available)) {
+                            if (times) {
+                                const sortedTimes = times.split(',').map(time => parseFloat(time)).sort((a, b) => a - b);
+                                const dayIndex = weekOrder.indexOf(day);
+                                const currentDayIndex = availableDay ? weekOrder.indexOf(availableDay) : Infinity;
+
+                                // Compare day order first, then times
+                                if (
+                                    !earliestTime || 
+                                    dayIndex < currentDayIndex || 
+                                    (dayIndex === currentDayIndex && sortedTimes[0] < earliestTime)
+                                ) {
+                                    availableDay = day;
+                                    earliestTime = sortedTimes[0];
+                                    currentDoctor = doc;
+                                }
                             }
                         }
                     }
                 }
-            }
 
             if (currentDoctor && availableDay) {
                 // Update the doctor’s availability by removing the earliest time
+                const earliestTimeAllocated = convertToActualTime(earliestTime);
                 let updatedTimes = currentDoctor.Days_available[availableDay]
                     .split(',')
                     .filter(time => parseFloat(time) !== earliestTime);
@@ -203,18 +206,21 @@ async function allocation_priority(input, department) {
                     { $set: { [`Days_available.${availableDay}`]: updatedTimes.join(',') } }
                 );
 
-                console.log(`Disease : Allergy`);
                 console.log(`Allocated Department : ${department}`);
-                console.log(`Department: ${department}`);
                 console.log(`Doctor's Name: ${currentDoctor.Name}`);
+                console.log(`Earliest Time: ${earliestTimeAllocated}`);
                 console.log("Days Available:");
                 Object.entries(currentDoctor.Days_available).forEach(([day, times]) => {
                     console.log(`${day}: "${times || "Not Available"}"`);
                 });
                 console.log(`Updated availability for ${currentDoctor.Name} on ${availableDay}: ${updatedTimes.join(',')}`);
 
-                // Terminate after the first operation for one doctor
-                return;
+                return {
+                    doctorName: currentDoctor.Name,
+                    designation: currentDoctor.Designation_yearsofexperience || "Unknown",
+                    // day: availableDay,
+                    visitTiming: earliestTimeAllocated,
+                };
             }
         } else {
             console.log(`No doctors found for department: ${department}`);
@@ -226,4 +232,4 @@ async function allocation_priority(input, department) {
     }
 }
 
-module.exports = { allocation_priority };
+module.exports = { doc_allocation };

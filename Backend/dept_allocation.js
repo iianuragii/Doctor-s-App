@@ -43,10 +43,8 @@ function dept_allocation(diseaseName) {
         "Arthritis": "Rheumatologists",
         "Tuberculosis": "Pulmonologist"
     };
-    
-      
+          
     console.log(`Disease : ${diseaseName}`);
-    console.log(`Allocated Department : ${diseaseVsDoctor[diseaseName]}`);
     return diseaseVsDoctor[diseaseName] || "Respective department not found";
 
 }
