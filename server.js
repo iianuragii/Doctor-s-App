@@ -1,11 +1,11 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
-const { doc_allocation } = require('./Backend/doc_allocation');
-const { dept_allocation } = require('./Backend/dept_allocation');
+const { doc_allocation } = require('./Controller/doc_allocation');
+const { dept_allocation } = require('./Controller/dept_allocation');
 const jwt = require('jsonwebtoken'); 
 require('dotenv').config();
-const client = require('./Database/dbAuth');
+const client = require('./Config/auth');
 const router = express.Router();
 
 const app = express();
@@ -27,21 +27,6 @@ app.get('/', (req, res) => {
     res.send(message);
 });
 
-// app.post('/signup', async (req, res) => {
-//     const { email, password } = req.body;
-
-//     try {
-//         await client.connect();
-//         const collection = client.db("patientSignUp").collection("patientSignUpCollection");
-//         const result = await collection.insertOne({ email, password });
-
-//         console.log('User inserted:', result.insertedId);
-//         res.status(201).json({ message: 'User registered successfully' });
-//     } catch (error) {
-//         console.error('Error inserting user:', error);
-//         res.status(500).json({ message: 'Error registering user' });
-//     }
-// });
 app.post('/signup', async (req, res) => {
     const { email, password } = req.body;
 
@@ -76,24 +61,7 @@ app.post('/signup', async (req, res) => {
         res.status(500).json({ message: 'Error registering user' });
     }
 });
-// app.post('/login', async (req, res) => {
-//     const { email, password } = req.body;
 
-//     try {
-//         await client.connect();
-//         const user = await client.db("patientSignUp").collection("patientSignUpCollection").findOne({ email });
-
-//         if (user && user.password === password) {
-//             console.log("Login successful");
-//             res.status(200).json({ message: 'Login successful' });
-//         } else {
-//             res.status(401).json({ message: 'Invalid email or password' });
-//         }
-//     } catch (error) {
-//         console.error('Error in login endpoint:', error);
-//         res.status(500).json({ message: 'Internal Server Error' });
-//     }
-// });
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
