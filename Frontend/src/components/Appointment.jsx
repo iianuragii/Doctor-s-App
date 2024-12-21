@@ -50,7 +50,7 @@ const handleSymptomsChange = (selectedSymptoms) => {
     e.preventDefault();
     if (validateForm()) {
       try {
-        const response = await axios.post('http://localhost:4000/api', formData);
+        const response = await axios.post('http://localhost:4000/symptoms', formData);
         alert('Form submitted successfully');
         console.log('Response:', response.data);
         navigate('/output');

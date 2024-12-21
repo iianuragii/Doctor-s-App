@@ -17,7 +17,7 @@ const Profile = () => {
   
 //   useEffect(() => {
 //     const fetchUserData = async () => {
-//       const response = await fetch(`/api/user/${userEmail}`); // Example API endpoint
+//       const response = await fetch(`/symptoms/user/${userEmail}`); // Example API endpoint
 //       const data = await response.json();
 //       setUserData(data);
 //     };
