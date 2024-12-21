@@ -23,7 +23,7 @@ let department = null;
 app.get('/', (req, res) => {
     const message = storedData
         ? `Doctor allocated based on symptoms: ${storedData.result}, disease: ${diseaseName.result}, department: ${department.result}`
-        : 'No data received yet. Please submit the symptoms via /api';
+        : 'No data received yet. Please submit the symptoms via /symptoms';
     res.send(message);
 });
 
@@ -93,7 +93,7 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.post('/api', async (req, res) => {
+app.post('/symptoms', async (req, res) => {
     const { symptoms } = req.body;
 
     try {       
